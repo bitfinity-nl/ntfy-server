@@ -1,0 +1,22 @@
+---
+# Title: Handlers
+#
+# Author: Bitfinity / L. Rutten
+# Owner: Bitfinity / L. Rutten
+#
+# File: handlers/main.yml
+#
+# Description:
+#   This handlers file contains the tasks when needed.
+#
+- name: "restart_apache2"
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    enabled: yes
+    name: apache2
+    
+- name: "reload_apache2"
+  systemd:
+    daemon_reload: yes
+    name: apache2
