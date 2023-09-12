@@ -1,0 +1,39 @@
+---
+# Title: bit-test-01
+#
+# Author: Bitfinity / L. Rutten
+# Owner: Bitfinity / L. Rutten
+#
+# File: playbook-pull.yml
+#
+# Description:
+#   Playbook for testing.
+#
+- hosts: localhost
+  connection: local
+  become: true
+
+  pre_tasks:
+    - name: "Include defaults file ~/.ansible-config.yml"
+      ansible.builtin.include_vars: ~/.ansible-config.yml
+      
+  vars:  
+    # -- ntfy --
+    ntfy_ssl_certificate_file     : '/etc/letsencrypt/live/{{ certbot_serveralias }}/fullchain.pem'
+    ntfy_ssl_certificate_key_file : '/etc/letsencrypt/live/{{ certbot_serveralias }}/privkey.pem'
+
+  handlers:
+    - include: handlers/main.yml
+    
+  roles:
+    #- role-automatic-updates
+    - role-certbot-apache2
+
+  tasks:
+    - name: "Include tasks/role-ntfy-docker.yml"
+      include_tasks: tasks/role-ntfy-docker.yml
+
+    - name: "Include tasks/03-apache2.yml"
+      include_tasks: tasks/03-apache2.yml
+
+       
