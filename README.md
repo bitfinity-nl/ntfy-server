@@ -1,4 +1,4 @@
-# role-ntfy-docker
+# ntfy-server 
 ntfy (pronounced notify) is a simple HTTP-based pub-sub notification service.
 
 
