@@ -1,0 +1,55 @@
+---
+# Title: ntfy
+#
+# Author: Bitfinity / L. Rutten
+# Owner: Vissers Energy Group / L. Rutten
+#
+# File: tasks/role-ntfy-docker.yml
+#
+# Description:
+#    ntfy (pronounced notify) is a simple  
+#    HTTP-based pub-sub notification service.
+#
+# Source(s):
+#   - https://ntfy.sh/#free-software
+#   - https://docs.ntfy.sh/install/
+#
+- name: "Install APT packages"
+  ansible.builtin.apt:
+    pkg:
+    - docker.io
+    - python3
+    - python3-pip
+    - docker-compose
+
+- name: "Pull Docker image ntfy.sh"
+  community.docker.docker_image:
+    name: binwiederhier/ntfy
+    source: pull
+
+- name: "Start container, client ntfy "
+  docker_container:
+    name: ntfy
+    image: binwiederhier/ntfy
+    state: started
+    restart: yes
+    restart_policy: always
+    container_default_behavior: no_defaults
+    command:
+      - serve
+    env:
+      TZ=UTC
+    #user: UID:GID
+    user: 1000:1000
+    volumes:
+      - /var/cache/ntfy:/var/cache/ntfy
+      - /etc/ntfy:/etc/ntfy
+    ports:
+      - 2586:80
+    healthcheck: # optional: remember to adapt the host:port to your environment
+        test: ["CMD-SHELL", "wget -q --tries=1 http://localhost:2586/v1/health -O - | grep -Eo '\"healthy\"\\s*:\\s*true' || exit 1"]
+        interval: 60s
+        timeout: 10s
+        retries: 3
+        start_period: 40s
+    #restart: unless-stopped
