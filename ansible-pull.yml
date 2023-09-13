@@ -4,17 +4,46 @@
 # Author: Bitfinity / L. Rutten
 # Owner: Bitfinity / L. Rutten
 #
-# File: playbook-pull.yml
+# File: ansible-pull.yml
 #
 # Description:
 #   Playbook for testing.
+
+
+# --- Play 1. Requirements ---
+#
+# Description:
+#   This play contains the roles that this playbook depends on.
+#
+- hosts: localhost
+  connection: local
+  become: true
+
+   - name: "Create Ansible directory structure"
+     ansible.builtin.file:
+        name: /etc/ansible/roles/
+        state: directory
+    
+    - name: "Retrieve roles from the git-repository"
+      ansible.builtin.git:
+        repo: "https://github.com/bitfinity-nl/role-automatic-updates.git"
+        dest: "/etc/ansible/roles/{{ item.}}"
+        version: main
+      loop:
+        - { name: 'role-automatic-updates', repo: 'https://github.com/bitfinity-nl/role-automatic-updates.git', version: 'main' }
+
+        
+# --- Play 2. Playbook ---
+#
+# Description:
+#   This play contains the tasks for configuring the server.
 #
 - hosts: localhost
   connection: local
   become: true
 
   pre_tasks:
-    - name: "Include defaults file ~/.ansible-config.yml"
+    - name: "This configuration file contains the variable(s) for this playbook (~/.ansible-config.yml)."
       ansible.builtin.include_vars: ~/.ansible-config.yml
       
   vars:  
@@ -26,7 +55,7 @@
     - include: handlers/main.yml
     
   roles:
-    #- role-automatic-updates
+    - role-automatic-updates
     - role-certbot-apache2
 
   tasks:
